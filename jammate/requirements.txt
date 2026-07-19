@@ -1,0 +1,16 @@
+# Core
+numpy>=1.24.0
+pyzmq>=25.0.0
+sounddevice>=0.4.6
+soundfile>=0.12.1
+python-rtmidi>=1.5.8
+mido>=1.3.0
+colorama>=0.4.6
+
+# AI / ML (Laptop)
+openvino>=2023.3.0
+# torch (Optional, for specific extraction models if not OpenVINO)
+
+# Utilities
+PyYAML>=6.0
+rich>=13.0.0  # For nice CLI dashboards

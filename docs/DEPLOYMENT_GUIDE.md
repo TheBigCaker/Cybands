@@ -62,8 +62,8 @@
 #### Steps
 1. **Clone your Wix site repository**
    ```bash
-   git clone git@github.com:YourUsername/TFTM_Wix.git
-   cd TFTM_Wix
+   git clone git@github.com:YourUsername/Cybands.git
+   cd Cybands
    ```
 
 2. **Copy the Velo code files**
@@ -112,7 +112,7 @@ If you have GitHub connected to your Replit account:
 3. **Initialize git and add your Wix repo as remote**
    ```bash
    git init
-   git remote add wix git@github.com:TheBigCaker/TFTM_Wix.git
+   git remote add wix git@github.com:TheBigCaker/Cybands.git
    ```
 
 4. **Pull the latest from your Wix repo**

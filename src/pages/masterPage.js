@@ -1,97 +1,75 @@
 /**
  * ═══════════════════════════════════════════════════
- *  SOMYNENCE NEURAL HEARTBEAT — MASTER PAGE (V49)
- *  Global monitor for the alt-vibe.net ecosystem.
- *  Polls the Genesis Helix bridge for live telemetry.
+ *  ALTERNATIVE VIBRATION NETWORK — MASTER PAGE (V50)
+ *  Global controller for the alt-vibe.net ecosystem.
+ *  Initializes telluric-cosmic indices for all pages.
  * ═══════════════════════════════════════════════════
  */
-import { fetch } from 'wix-fetch';
-import { getUserSubscriptionTier } from 'backend/subscriptionChecker';
-
-const BRIDGE_URL = 'https://c94a0c21-09b3-4340-9b51-81cafcbba6f7-00-3lwwfp71ahcx0.spock.replit.dev:8000';
-let heartbeatInterval = null;
+import { getLatestPredictions } from 'backend/tapService.jsw';
+import { local } from 'wix-storage';
 
 $w.onReady(async function () {
-  console.log("⚡ Somynence Brain: Online");
-  await manageSiteWideAds();
-  startHeartbeatPulse();
+  console.log("⚡ Alternative Vibration Network: Online");
+  await initializeGlobalMetrics();
 });
 
-// ─── NEURAL HEARTBEAT ───────────────────────────────
-async function startHeartbeatPulse() {
-  // Initial pulse
-  await fetchAndApplyPulse();
-  // Continuous polling every 3 seconds
-  heartbeatInterval = setInterval(fetchAndApplyPulse, 3000);
-}
-
-async function fetchAndApplyPulse() {
+/**
+ * Retrieves the latest TAP daily predictions and stores them locally
+ * for fast access across all sub-pages.
+ */
+async function initializeGlobalMetrics() {
   try {
-    const response = await fetch(`${BRIDGE_URL}/status`, { method: 'get' });
-    if (response.ok) {
-      const status = await response.json();
-      updateVisualPulse(status);
+    const res = await getLatestPredictions();
+    if (res.success) {
+      console.log(`[AVN] Loaded daily predictions for date: ${res.date}`);
+      
+      // Store in local storage for sub-pages to read instantly
+      local.setItem("tap_daily_metrics", JSON.stringify(res.data));
+
+      // Apply global visual state overrides if elements are present in header/footer
+      applyGlobalUI(res.data);
+    } else {
+      console.warn("⚠ Predictions not found, waiting for pipeline backfill.");
     }
   } catch (err) {
-    console.warn("⚠ Pulse Lost: Reconnecting...");
+    console.error("⚠ Global initialization failed:", err.message);
   }
 }
 
-function updateVisualPulse(status) {
-  // Extract telemetry
-  const loss = status.loss || 0;
-  const step = status.step || 0;
-  const chemicals = status.chemicals || {};
-  const dopamine = chemicals.dopamine || 0.5;
-  const cortisol = chemicals.cortisol || 0.3;
-
-  // Compute visual state
-  const isCalm = dopamine > cortisol;
-  const pulseColor = isCalm ? '#00FFCC' : '#FF0055';
-  const glowIntensity = Math.min(1, Math.max(0.2, 1 - loss));
-
-  // Apply to site elements (these IDs must exist on the page)
+/**
+ * Updates global header/footer elements if they are present on the current layout.
+ * @param {object} predictions - The complete daily predictions dataset
+ */
+function applyGlobalUI(predictions) {
+  // 1. Planetary Kp Status Indicator
   try {
-    if ($w('#neuralPulse')) {
-      $w('#neuralPulse').style.color = pulseColor;
-      $w('#neuralPulse').style.backgroundColor = pulseColor;
+    if ($w('#textGlobalKp')) {
+      const kp = predictions.cosmic.current_kp || 0;
+      $w('#textGlobalKp').text = `Kp: ${kp.toFixed(2)}`;
+      
+      // Apply color coding based on geomagnetic activity
+      if (kp >= 5) {
+        $w('#textGlobalKp').style.color = '#ff5e62'; // Red (Geomagnetic Storm)
+      } else if (kp >= 3) {
+        $w('#textGlobalKp').style.color = '#ffc107'; // Yellow (Unsettled)
+      } else {
+        $w('#textGlobalKp').style.color = '#00f2fe'; // Cyan (Calm / Resonant)
+      }
     }
-  } catch (e) { /* Element may not exist on every page */ }
+  } catch (e) {}
 
+  // 2. Global Seismic Window Status
   try {
-    if ($w('#statusText')) {
-      $w('#statusText').text = `Step ${step} | Loss: ${loss.toFixed(4)} | D:${dopamine.toFixed(2)} C:${cortisol.toFixed(2)}`;
+    if ($w('#textGlobalSeismic')) {
+      $w('#textGlobalSeismic').text = predictions.seismic.framework_prediction;
     }
-  } catch (e) { /* Optional element */ }
-}
+  } catch (e) {}
 
-// ─── EXISTING AD MANAGEMENT ─────────────────────────
-async function manageSiteWideAds() {
+  // 3. Global Telluric Alignment Drift
   try {
-    const subscriptionInfo = await getUserSubscriptionTier();
-    if (subscriptionInfo.showAds) {
-      enableAdSense();
-    } else {
-      disableAdSense();
+    if ($w('#textGlobalDrift')) {
+      const drift = predictions.cosmic.couplings.california_strike_slip || 0;
+      $w('#textGlobalDrift').text = `Drift: +${drift.toFixed(4)}`;
     }
-  } catch (error) {
-    console.error('Error managing site-wide ads:', error);
-    enableAdSense();
-  }
-}
-
-function enableAdSense() {
-  console.log('AdSense enabled for free tier user');
-}
-
-function disableAdSense() {
-  console.log('AdSense disabled for paid subscriber');
-}
-
-export function onLogin(event) {
-  manageSiteWideAds();
-}
-
-export function onLogout(event) {
-  enableAdSense();
+  } catch (e) {}
 }

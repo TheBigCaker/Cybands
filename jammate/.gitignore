@@ -1,0 +1,17 @@
+# Models (Too large for standard Git)
+models/
+*.gguf
+*.bin
+*.pt
+*.safetensors
+
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
